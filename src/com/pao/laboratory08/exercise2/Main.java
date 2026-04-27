@@ -2,6 +2,8 @@ package com.pao.laboratory08.exercise2;
 
 import java.io.*;
 import java.util.*;
+import com.pao.laboratory08.exercise1.Student;
+import com.pao.laboratory08.exercise1.Adresa;
 
 public class Main {
     private static final String FILE_PATH = "src/com/pao/laboratory08/tests/studenti.txt";

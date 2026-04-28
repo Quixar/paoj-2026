@@ -6,6 +6,8 @@ import java.io.*;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.*;
+import com.pao.laboratory09.exercise1.TipTranzactie;
+import com.pao.laboratory09.exercise1.Tranzactie;
 
 public class Main {
     private static final String OUTPUT_FILE = "output/lab09_ex2.bin";
@@ -31,6 +33,5 @@ public class Main {
         // Format linie output:
         //   [idx] id=<id> data=<data> tip=<CREDIT|DEBIT> suma=<suma:.2f> RON status=<STATUS>
 
-        System.out.println("TODO: implementează exercițiul 2");
     }
 }

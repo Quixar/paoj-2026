@@ -3,25 +3,20 @@ package com.pao.proiect.CatalogScolar.services;
 import com.pao.proiect.CatalogScolar.exception.StudentNotFoundException;
 import com.pao.proiect.CatalogScolar.model.CodInmatriculare;
 import com.pao.proiect.CatalogScolar.model.Student;
+import com.pao.proiect.CatalogScolar.repository.StudentRepository;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.TreeSet;
-import java.util.HashMap;
 import java.util.Set;
+import java.util.TreeSet;
 
 public class StudentService {
     private static StudentService instance;
-
-    private final List<Student> students;
-    private final Map<CodInmatriculare, Student> studentsByCode;
-    private final Set<Student> sortedStudents;
+    private final StudentRepository studentRepository;
+    private final AuditService auditService;
 
     private StudentService() {
-        students = new ArrayList<>();
-        studentsByCode = new HashMap<>();
-        sortedStudents = new TreeSet<>();
+        this.studentRepository = new StudentRepository();
+        this.auditService = AuditService.getInstance();
     }
 
     public static StudentService getInstance() {
@@ -32,73 +27,54 @@ public class StudentService {
     }
 
     public void addStudent(Student student) {
-        students.add(student);
-        studentsByCode.put(student.getCodInmatriculare(), student);
-        sortedStudents.add(student);
+        auditService.logAction("adauga_student");
+        studentRepository.save(student);
     }
 
     public void deleteStudent(CodInmatriculare code) throws StudentNotFoundException {
-        Student student = findByCode(code);
-        students.remove(student);
-        studentsByCode.remove(code);
-        sortedStudents.remove(student);
+        auditService.logAction("sterge_student");
+        // Проверяем существование перед удалением
+        findByCode(code);
+        studentRepository.delete(code.getValoare());
     }
 
     public Student findByCode(CodInmatriculare code) throws StudentNotFoundException {
-        Student student = studentsByCode.get(code);
-
-        if (student == null) {
-            throw new StudentNotFoundException("Studentul cu codul " + code + " nu a fost găsit.");
-        }
-
-        return student;
-    }
-
-    public Student findByName(String name) throws StudentNotFoundException {
-        for (Student student : students) {
-            if (student.getFullName().equalsIgnoreCase(name)) {
-                return student;
-            }
-        }
-
-        throw new StudentNotFoundException("Studentul cu numele " + name + " nu a fost găsit.");
+        auditService.logAction("cauta_student_dupa_cod");
+        return studentRepository.findById(code.getValoare())
+                .orElseThrow(() -> new StudentNotFoundException("Studentul cu codul " + code + " nu a fost găsit."));
     }
 
     public List<Student> getAllStudents() {
-        return new ArrayList<>(students);
+        auditService.logAction("listeaza_studenti");
+        return studentRepository.findAll();
     }
 
     public Set<Student> getSortedStudents() {
-        return new TreeSet<>(sortedStudents);
+        auditService.logAction("listeaza_studenti_sortati");
+        return new TreeSet<>(studentRepository.findAll());
     }
 
     public String getAllStudentsAsString() {
-        if (students.isEmpty()) {
+        List<Student> allStudents = getAllStudents();
+        if (allStudents.isEmpty()) {
             return "Nu există studenți în catalog.";
         }
-
-        StringBuilder result = new StringBuilder("Lista studenților:\n");
-
-        for (Student student : students) {
-            result.append(student)
-                    .append("\n\n");
+        StringBuilder result = new StringBuilder("Lista studenților din DB:\n");
+        for (Student student : allStudents) {
+            result.append(student).append("\n\n");
         }
-
         return result.toString();
     }
 
     public String getSortedStudentsAsString() {
-        if (sortedStudents.isEmpty()) {
+        Set<Student> sorted = getSortedStudents();
+        if (sorted.isEmpty()) {
             return "Nu există studenți în catalog.";
         }
-
-        StringBuilder result = new StringBuilder("Lista studenților sortați alfabetic:\n");
-
-        for (Student student : sortedStudents) {
-            result.append(student)
-                    .append("\n\n");
+        StringBuilder result = new StringBuilder("Lista studenților sortați alfabetic din DB:\n");
+        for (Student student : sorted) {
+            result.append(student).append("\n\n");
         }
-
         return result.toString();
     }
 }

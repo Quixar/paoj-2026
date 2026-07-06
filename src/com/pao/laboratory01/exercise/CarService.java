@@ -64,23 +64,38 @@ public class CarService {
 
     /**
      * TODO — Exercițiu bonus
-     *
+     * <p>
      * Adaugă un review la mașina cu numele dat.
-     *
+     * <p>
      * Pași:
      * 1. Parcurge array-ul cars cu un for.
      * 2. Compară numele fiecărei mașini cu carName folosind .equals()
-     *    (ex: cars[i].getName().equals(carName))
+     * (ex: cars[i].getName().equals(carName))
      * 3. Dacă o găsești:
-     *    a. Ia array-ul curent de reviews: cars[i].getReviews()
-     *    b. Creează un array nou cu length + 1 (același pattern ca la addCar)
-     *    c. Copiază review-urile vechi + adaugă review-ul nou
-     *    d. Setează noul array: cars[i].setReviews(newReviews)
-     *    e. Afișează un mesaj de confirmare și return
+     * a. Ia array-ul curent de reviews: cars[i].getReviews()
+     * b. Creează un array nou cu length + 1 (același pattern ca la addCar)
+     * c. Copiază review-urile vechi + adaugă review-ul nou
+     * d. Setează noul array: cars[i].setReviews(newReviews)
+     * e. Afișează un mesaj de confirmare și return
      * 4. Dacă nu o găsești (for-ul se termină), afișează "Mașina nu a fost găsită."
      */
     public void addReview(String carName, String review) {
-        // TODO: implementează aici
+        for (var car : cars) {
+            if (car.getName().equals(carName)) {
+                String[] oldReviews = car.getReviews();
+
+                String[] newReviews = new String[oldReviews.length + 1];
+
+                System.arraycopy(oldReviews, 0, newReviews, 0, oldReviews.length);
+
+                newReviews[newReviews.length - 1] = review;
+
+                car.setReviews(newReviews);
+
+                System.out.println("Review-ul a fost adăugat cu succes pentru mașina \"" + carName + "\"!");
+                return;
+            }
+        }
+        System.out.println("Masina nu a fost gasita");
     }
 }
-
